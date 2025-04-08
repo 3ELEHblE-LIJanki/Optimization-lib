@@ -1,3 +1,5 @@
+from lrs import gradient
+
 def pretty_print(descent, name, found_result):
     print("""
         {:s}
@@ -11,5 +13,5 @@ def pretty_print(descent, name, found_result):
                      str(descent.get_path()[-1]), 
                      len(descent.get_path()), 
                      descent.get_f().get_count(), 
-                     descent.get_f().get_count())
+                     gradient.get_count())
     )
