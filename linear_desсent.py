@@ -1,7 +1,7 @@
 from math import sqrt
 from typing import Callable, List
 
-from gradient_descent import FunctionWrapper
+from function_wrapper import FunctionWrapper
 import numpy as np
 
 # работает только для функций 1d

@@ -4,7 +4,7 @@ import math
 import numpy as np
 
 from linear_desсent import LinearDecent
-from gradient_descent import FunctionWrapper
+from function_wrapper import FunctionWrapper
 
 EPS = 1e-8
 
@@ -15,11 +15,13 @@ def diff(f, x, eps, index: int):
     x_j[index] -= eps
     return (f(x_i) - f(x_j)) / (2 * eps)
 
-def gradient(f, x, eps):
+def __gradient(f, x, eps):
     grad = []
     for i in range(len(x)):
         grad.append(diff(f, x, eps, i))
     return grad
+
+gradient = FunctionWrapper(__gradient)
 
 def mult(x_1, x_2):
     res = 0
