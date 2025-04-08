@@ -1,0 +1,5 @@
+# Do not store enviroments
+.venv/
+
+# Do not store pycache
+__pycache__/
