@@ -96,8 +96,9 @@ class SimpyWrapper:
         self.bounds = bounds
         self.eps = eps
 
-    def find_min(self, start: List[float], max_iterations: int) -> float:
+    def find_min(self, method: str, start: List[float], max_iterations: int) -> float:
         """
+            method: str - метод, который будет использован для поиска минимума
             start: List[float] - стартовая точка, в которой начнём поиск
             max_iterations: int - максимальное количество итераций спуска
             return - минимум полученный в ходе спуска
@@ -106,7 +107,7 @@ class SimpyWrapper:
         self.res = minimize(
             x0=start,
             fun=self.f,
-            method='CG',
+            method=method,
             callback=lambda x: self.path.append(x.tolist()),
             options={'maxiter': max_iterations}
         )

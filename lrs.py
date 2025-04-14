@@ -23,6 +23,20 @@ def __gradient(f, x, eps):
 
 gradient = FunctionWrapper(__gradient)
 
+def double_diff(f, x, eps, ind1, ind2):
+    return diff(lambda x: diff(f, x, eps, ind1), x, eps, ind2)
+
+def __hessian(f, x, eps):
+    hess = []
+    for i in range(len(x)):
+        tmp = []
+        for j in range(len(x)):
+            tmp.append(double_diff(f, x, eps, i, j))
+        hess.append(tmp)
+    return hess
+
+hessian = FunctionWrapper(__hessian)
+
 def mult(x_1, x_2):
     res = 0
     for i in range(len(x_1)):
