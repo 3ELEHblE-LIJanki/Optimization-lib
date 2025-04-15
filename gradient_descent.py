@@ -28,7 +28,7 @@ class GradientDecent:
         self.eps = eps
 
     def __init(self, start: List[float]):
-        self.x = start
+        self.x = start.copy()
         self.path = []
 
     def __find(self, start: List[float], max_iterations, op):

@@ -17,11 +17,7 @@ class FunctionWrapper:
         """
             :param x: - точка, в которой мы хотим посчитать значение функции
         """
-        return self.f_cached(self.__serialize_data(*args))
-
-    @staticmethod
-    def __serialize_data(*args) -> bytes:
-        return pickle.dumps(args)
+        return self.f_cached(pickle.dumps(args))
 
     @lru_cache(maxsize=None)
     def f_cached(self, serialized: bytes) -> float:
@@ -41,3 +37,4 @@ class FunctionWrapper:
             сбросить кол-во вызовов функции
         """
         self.count = 0
+        self.f_cached.cache_clear()
