@@ -6,16 +6,17 @@ class FunctionWrapper:
     """
     def __init__(self, f: Callable[[List[float]], float]):
         """
-            f: - функция, которую мы хотим обернуть
+            :param f: - функция, которую мы хотим обернуть
         """
+        self.memo = None
         self.f = f
         self.count = 0
 
     def __call__(self, *args) -> float:
         """
-            x: - точка, в которой мы хотим посчитать значение функции
+            :param x: - точка, в которой мы хотим посчитать значение функции
         """
-        if (args in self.memo):
+        if args in self.memo:
             return self.memo[args]
         
         self.count += 1
@@ -25,7 +26,7 @@ class FunctionWrapper:
     
     def get_count(self) -> int:
         """
-            return: - кол-во вызовов функции
+            :return: - кол-во вызовов функции
         """
         return self.count
     
