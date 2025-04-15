@@ -3,6 +3,7 @@ from function_wrapper import FunctionWrapper
 from lrs import LRS, hessian, gradient, boundize
 import numpy as np
 
+
 class NewtonCG:
     """
         Класс реализующий поиск максимума и минимума на основе градиентного спуска и переданных параметров
@@ -10,13 +11,13 @@ class NewtonCG:
 
     ACCEPTABLE_ACCURACY: float = 0.00001
 
-
     def __init__(self, learning_rate_scheduling: LRS, f: FunctionWrapper, bounds: List[List[float]],
                  eps: float = ACCEPTABLE_ACCURACY):
         """
-            learning_rate_scheduling - выбранная модель поиска шага
-            max_iterations - максимальное число итераций (чтобы не зациклиться)
-            eps: - точность подсчёта градиента
+            :param learning_rate_scheduling: - выбранная модель поиска шага
+            :param f: - функция для вычисления
+            :param bounds: - границы функции
+            :param eps: - точность подсчёта градиента
         """
         self.learning_rate_scheduling = learning_rate_scheduling
         self.proto_f = f
@@ -31,9 +32,9 @@ class NewtonCG:
 
     def find_min(self, start, max_iterations):
         """
-            start: List[float] - стартовая точка, в которой начнём поиск
-            max_iterations: int - максимальное количество итераций спуска
-            return - минимум полученный в ходе спуска
+            :param start: List[float] - стартовая точка, в которой начнём поиск
+            :param max_iterations: int - максимальное количество итераций спуска
+            :return: - минимум полученный в ходе спуска
         """
         self.__init(start)
         for i in range(max_iterations):

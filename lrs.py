@@ -59,9 +59,9 @@ def armiho(c1: float, q: float) -> LRS:
     """
     Правило Армихо
 
-    c1 - гиперпараметр
+    :param c1: - гиперпараметр
 
-    return - LRS (learning rate scheduling) по правилу Армихо с заданными гипер-параметрами
+    :return: - LRS (learning rate scheduling) по правилу Армихо с заданными гипер-параметрами
     """
     return lambda x, _, f, f_bounds: _arm(c1, q, x, f, f_bounds)
 
@@ -78,10 +78,10 @@ def wolfe(c1: float = 1e-4, c2: float = 0.9) -> LRS:
     """
     Правило Вольфе
 
-    c1 - гиперпараметр 
-    c2 - гиперпараметр
+    :param c1: - гиперпараметр
+    :param c2: - гиперпараметр
 
-    return - LRS (learning rate scheduling) по правилу Вольфе с заданными гипер-параметрами
+    :return: - LRS (learning rate scheduling) по правилу Вольфе с заданными гипер-параметрами
     """
     return lambda x, _, f, f_bounds: _wolfe(c1, c2, x, f, f_bounds)
 
@@ -121,9 +121,9 @@ def goldstein(c1: float = 0.1) -> LRS:
     """
     Правило Голдстейна
 
-    c1 - гиперпараметр
+    :param c1: - гиперпараметр
 
-    return - LRS (learning rate scheduling) по правилу Голдстейна с заданными гипер-параметрами
+    :return: - LRS (learning rate scheduling) по правилу Голдстейна с заданными гипер-параметрами
     """
     return lambda x, _, f, f_bounds: _goldstein(c1, x, f, f_bounds)
 
@@ -164,9 +164,9 @@ def constant(h0: float) -> LRS:
     """
     Постоянный метод планирования шага
 
-    h0 - шаг
+    :param h0: - шаг
 
-    return - Постоянный LRS (learning rate scheduling) с заданными гипер-параметрами
+    :return: - Постоянный LRS (learning rate scheduling) с заданными гипер-параметрами
     """
     return lambda _x, _k, _f, _b: h0
 
@@ -174,10 +174,10 @@ def exponential_decay(h0: float, l: float) -> LRS:
     """
     Функциональный метод планирования шага (Экспоненциальное затухание)
 
-    h0 - начальный шаг
-    l - степень затухания
+    :h0: - начальный шаг
+    :param l: - степень затухания
 
-    return - Функциональный LRS (learning rate scheduling) с заданными гипер-параметрами
+    :return: - Функциональный LRS (learning rate scheduling) с заданными гипер-параметрами
     """
     return lambda _x, k, _f, _b: h0 * math.e**(-l * k)
 
@@ -185,10 +185,10 @@ def polynomial_decay(a: float, b: float) -> LRS:
     """
     Функциональный метод планирования шага (Полиномиальное затухание)
 
-    a - гиперпараметр
-    b - гиперпараметр
+    :param a: - гиперпараметр
+    :param b: - гиперпараметр
 
-    return - Функциональный LRS (learning rate scheduling) с заданными гипер-параметрами
+    :return: - Функциональный LRS (learning rate scheduling) с заданными гипер-параметрами
     """
     return lambda _x, k, _f, _b: (1.0 / math.sqrt(k + 1)) * (b * k + 1)**(-a)
 
@@ -196,7 +196,7 @@ def polynomial_decay(a: float, b: float) -> LRS:
 def linear_search(eps: float, max_steps_count: int, lin_algo) -> Callable:
     """
     Метод линейного поиска.
-    :param eps: точность поиска
+    :param eps: Точность поиска
     :param max_steps_count: максимальное число шагов
     :param lin_algo: алгоритм одномерного спуска
     :return: функция, выполняющая линейный поиск по направлению антиградиента
@@ -208,7 +208,7 @@ def __linear_search(x: np.ndarray, f: Callable, eps: float, max_steps_count: int
     """
     Выполняет линейный поиск в направлении антиградиента.
 
-    :param x: текущая точка
+    :param x: Текущая точка
     :param f: целевая функция
     :param eps: точность поиска
     :param max_steps_count: максимальное число шагов

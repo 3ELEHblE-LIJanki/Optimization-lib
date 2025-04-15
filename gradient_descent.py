@@ -17,9 +17,10 @@ class GradientDecent:
     def __init__(self, learning_rate_scheduling: LRS, f: FunctionWrapper, bounds: List[List[float]],
                  eps: float = ACCEPTABLE_ACCURACY):
         """
-            learning_rate_scheduling - выбранная модель поиска шага
-            max_iterations - максимальное число итераций (чтобы не зациклиться)
-            eps: - точность подсчёта градиента
+            :param learning_rate_scheduling: - выбранная модель поиска шага
+            :param f: - функция для вычисления
+            :param bounds: - границы функции
+            :param eps: - точность подсчёта градиента
         """
         self.learning_rate_scheduling = learning_rate_scheduling
         self.f = f
@@ -49,18 +50,18 @@ class GradientDecent:
 
     def find_min(self, start: List[float], max_iterations: int) -> float:
         """
-            start: List[float] - стартовая точка, в которой начнём поиск
-            max_iterations: int - максимальное количество итераций спуска
-            return - минимум полученный в ходе спуска
+            :param  start: List[float] - стартовая точка, в которой начнём поиск
+            :param  max_iterations: int - максимальное количество итераций спуска
+            :return: - минимум полученный в ходе спуска
         """
         return self.__find(start, max_iterations, lambda x, y: x - y)
         
 
     def find_max(self, start: List[float], max_iterations: int) -> float:
         """
-            start: List[float] - стартовая точка, в которой начнём поиск
-            max_iterations: int - максимальное количество итераций спуска
-            return - максимум полученный в ходе спуска
+            :param start: List[float] - стартовая точка, в которой начнём поиск
+            :param max_iterations: int - максимальное количество итераций спуска
+            :return: - максимум полученный в ходе спуска
         """
         return self.__find(start, max_iterations, lambda x, y: x + y)
 
@@ -88,9 +89,8 @@ class SimpyWrapper:
     def __init__(self, f: FunctionWrapper, bounds: List[List[float]],
                  eps: float = ACCEPTABLE_ACCURACY):
         """
-            method: str - название метода из библиотеки scipy.optimize
-            bounds: - границы исследования функции
-            eps: - точность подсчёта градиента
+            :param bounds: - границы исследования функции
+            :param  eps: - точность подсчёта градиента
         """
         self.f = f
         self.bounds = bounds
@@ -98,10 +98,10 @@ class SimpyWrapper:
 
     def find_min(self, method: str, start: List[float], max_iterations: int) -> float:
         """
-            method: str - метод, который будет использован для поиска минимума
-            start: List[float] - стартовая точка, в которой начнём поиск
-            max_iterations: int - максимальное количество итераций спуска
-            return - минимум полученный в ходе спуска
+            :param method: - метод, который будет использован для поиска минимума
+            :param  start: - стартовая точка, в которой начнём поиск
+            :param  max_iterations: int - максимальное количество итераций спуска
+            :return: - минимум полученный в ходе спуска
         """
         self.path=[start]
         self.res = minimize(
