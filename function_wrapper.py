@@ -16,12 +16,13 @@ class FunctionWrapper:
         """
             :param x: - точка, в которой мы хотим посчитать значение функции
         """
-        if args in self.memo:
+        if self.memo is not None and args in self.memo:
             return self.memo[args]
         
         self.count += 1
         res = self.f(*args)
-        self.memo[args] = res
+        if self.memo is not None:
+            self.memo[args] = res
         return res
     
     def get_count(self) -> int:
