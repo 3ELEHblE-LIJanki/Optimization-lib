@@ -7,3 +7,4 @@ pandas>=2.2.3
 ipython>=8.18.1
 optuna
 ipywidgets
+cloudpickle

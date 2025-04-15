@@ -10,6 +10,7 @@ class GraphicsPlotter:
         self.descent = descent
         bounds = self.descent.get_bounds()
         self.is_1d = len(bounds) == 1
+        self.f = descent.get_f()
 
     @staticmethod
     def _setup_plot_style():
@@ -38,11 +39,11 @@ class GraphicsPlotter:
         bounds = [np.linspace(start, end, 1000) for start, end in self.descent.get_bounds()]
         if self.is_1d:
             x = bounds[0]
-            f_values = self.descent.get_f().call_without_memorization(x)
+            f_values = self.f(x)
             ax.plot(x, f_values, color=sns.color_palette("flare")[2], linewidth=2, alpha=0.9, label='Функция')
         else:
             grid = np.meshgrid(*bounds)
-            f_grid = self.descent.get_f().call_without_memorization(grid)
+            f_grid = self.f(grid)
             contourf = ax.contourf(*grid, f_grid, levels=50, cmap="flare", alpha=0.9)
             contours = ax.contour(*grid, f_grid, levels=15, colors='black', linewidths=1, alpha=0.8)
             ax.clabel(contours, inline=True, fontsize=12, fmt='%.1f', colors='black')
@@ -53,7 +54,7 @@ class GraphicsPlotter:
         path = np.array(self.descent.get_path())
         if self.is_1d:
             x_path = path
-            y_path = self.descent.get_f().call_without_memorization(x_path)
+            y_path = self.f(x_path)
             ax.plot(x_path, y_path, color='red', linewidth=3, alpha=0.9, label='Путь')
             ax.scatter(x_path[0], y_path[0], color='lime', s=250, edgecolor='black', label='Старт')
             ax.scatter(x_path[-1], y_path[-1], color='red', s=250, edgecolor='black', label='Минимум')
@@ -84,14 +85,14 @@ class GraphicsPlotter:
         fig, ax = GraphicsPlotter._create_figure(projection='3d')
         bounds = [np.linspace(start, end, 50) for start, end in self.descent.get_bounds()]
         grid = np.meshgrid(*bounds)
-        f_grid = self.descent.get_f()(grid)
+        f_grid = self.f(grid)
         surf = ax.plot_surface(*grid, f_grid, cmap="flare", alpha=0.7, edgecolor='none')
         path = np.array(self.descent.get_path())
-        ax.plot(path[:, 0], path[:, 1], self.descent.get_f()([path[:, 0], path[:, 1]]),
+        ax.plot(path[:, 0], path[:, 1], self.f([path[:, 0], path[:, 1]]),
                 color='red', linewidth=3, alpha=1.0, label='Путь')
-        ax.scatter(path[0, 0], path[0, 1], self.descent.get_f()([path[0, 0], path[0, 1]]),
+        ax.scatter(path[0, 0], path[0, 1], self.f([path[0, 0], path[0, 1]]),
                    color='lime', s=250, edgecolor='black', label='Старт')
-        ax.scatter(path[-1, 0], path[-1, 1], self.descent.get_f()([path[-1, 0], path[-1, 1]]),
+        ax.scatter(path[-1, 0], path[-1, 1], self.f([path[-1, 0], path[-1, 1]]),
                    color='red', s=250, edgecolor='black', label='Минимум')
         ax.view_init(elev=30, azim=135)
         ax.set_xlabel('x', fontsize=16, labelpad=20)
@@ -130,12 +131,12 @@ class GraphicsPlotter:
         def update(frame):
             if self.is_1d:
                 x_path = path[:frame + 1]
-                y_path = self.descent.get_f()([x_path])
+                y_path = self.f([x_path])
                 if np.isscalar(y_path):
                     y_path = np.array([y_path])
                 line.set_data(x_path, y_path)
-                start_point.set_data([path[0]], [self.descent.get_f()([path[0]])])
-                current_point.set_data([path[frame]], [self.descent.get_f()([path[frame]])])
+                start_point.set_data([path[0]], [self.f([path[0]])])
+                current_point.set_data([path[frame]], [self.f([path[frame]])])
             else:
                 line.set_data(path[:frame + 1, 0], path[:frame + 1, 1])
                 start_point.set_data([path[0, 0]], [path[0, 1]])
@@ -157,7 +158,7 @@ class GraphicsPlotter:
         fig, ax = GraphicsPlotter._create_figure(projection='3d')
         bounds = [np.linspace(start, end, 50) for start, end in self.descent.get_bounds()]
         grid = np.meshgrid(*bounds)
-        f_grid = self.descent.get_f()(grid)
+        f_grid = self.f(grid)
         surf = ax.plot_surface(*grid, f_grid, cmap="flare", alpha=0.7, edgecolor='none')
         path = np.array(self.descent.get_path())
         if path.ndim != 2 or path.shape[1] != 2:
@@ -186,11 +187,11 @@ class GraphicsPlotter:
 
         def update(frame):
             line.set_data(path[:frame + 1, 0], path[:frame + 1, 1])
-            line.set_3d_properties(self.descent.get_f()([path[:frame + 1, 0], path[:frame + 1, 1]]))
+            line.set_3d_properties(self.f([path[:frame + 1, 0], path[:frame + 1, 1]]))
             start_point.set_data([path[0, 0]], [path[0, 1]])
-            start_point.set_3d_properties([self.descent.get_f()([path[0, 0], path[0, 1]])])
+            start_point.set_3d_properties([self.f([path[0, 0], path[0, 1]])])
             current_point.set_data([path[frame, 0]], [path[frame, 1]])
-            current_point.set_3d_properties([self.descent.get_f()([path[frame, 0], path[frame, 1]])])
+            current_point.set_3d_properties([self.f([path[frame, 0], path[frame, 1]])])
             return line, start_point, current_point
 
         anim = FuncAnimation(fig, update, init_func=init, frames=len(path),

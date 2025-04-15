@@ -1,5 +1,6 @@
 from typing import Callable, List
 from functools import lru_cache
+import cloudpickle as pickle
 
 class FunctionWrapper:
     """
@@ -12,22 +13,22 @@ class FunctionWrapper:
         self.f = f
         self.count = 0
 
-    @lru_cache(maxsize=None)
     def __call__(self, *args) -> float:
         """
             :param x: - точка, в которой мы хотим посчитать значение функции
         """
-        self.count += 1
-        res = self.f(*args)
-        return res
+        return self.f_cached(self.__serialize_data(*args))
 
-    def call_without_memorization(self, *args) -> float:
-        """
-            Вызов функции без мемоизации (для графиков)
-            :param x: - точка, в которой мы хотим посчитать значение функции
-        """
-        res = self.f(*args)
-        return res
+    @staticmethod
+    def __serialize_data(*args) -> bytes:
+        return pickle.dumps(args)
+
+    @lru_cache(maxsize=None)
+    def f_cached(self, serialized: bytes) -> float:
+        args = pickle.loads(serialized)
+        self.count += 1
+        return self.f(*args)
+
     
     def get_count(self) -> int:
         """

@@ -27,16 +27,16 @@ class GradientDecent:
         self.bounds = bounds
         self.eps = eps
 
-    def __init(self, start: tuple[float]):
+    def __init(self, start: List[float]):
         self.x = start
         self.path = []
 
-    def __find(self, start: tuple[float], max_iterations, op):
+    def __find(self, start: List[float], max_iterations, op):
         self.__init(start)
         for i in range(max_iterations):
-            h = self.learning_rate_scheduling(tuple(self.x), i, self.f, self.bounds)
+            h = self.learning_rate_scheduling(self.x, i, self.f, self.bounds)
             self.path.append(self.x)
-            grad = gradient(self.f, tuple(self.x), self.eps)
+            grad = gradient(self.f, self.x, self.eps)
             xx = []
             for j in range(len(self.x)):
                 coord = op(self.x[j], h * grad[j])
@@ -46,9 +46,9 @@ class GradientDecent:
             if np.linalg.norm(np.array(self.x) - np.array(xx)) < self.eps:
                 break
             self.x = xx
-        return self.f(tuple(self.x))
+        return self.f(self.x)
 
-    def find_min(self, start: tuple[float], max_iterations: int) -> float:
+    def find_min(self, start: List[float], max_iterations: int) -> float:
         """
             :param  start: List[float] - стартовая точка, в которой начнём поиск
             :param  max_iterations: int - максимальное количество итераций спуска
