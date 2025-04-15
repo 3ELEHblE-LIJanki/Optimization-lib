@@ -38,13 +38,11 @@ class GraphicsPlotter:
         bounds = [np.linspace(start, end, 1000) for start, end in self.descent.get_bounds()]
         if self.is_1d:
             x = bounds[0]
-            f_values = []
-            for i in  x:
-                f_values.append(self.descent.get_f()([i]))
+            f_values = self.descent.get_f().call_without_memorization(x)
             ax.plot(x, f_values, color=sns.color_palette("flare")[2], linewidth=2, alpha=0.9, label='Функция')
         else:
             grid = np.meshgrid(*bounds)
-            f_grid = self.descent.get_f()(grid)
+            f_grid = self.descent.get_f().call_without_memorization(grid)
             contourf = ax.contourf(*grid, f_grid, levels=50, cmap="flare", alpha=0.9)
             contours = ax.contour(*grid, f_grid, levels=15, colors='black', linewidths=1, alpha=0.8)
             ax.clabel(contours, inline=True, fontsize=12, fmt='%.1f', colors='black')
@@ -55,7 +53,7 @@ class GraphicsPlotter:
         path = np.array(self.descent.get_path())
         if self.is_1d:
             x_path = path
-            y_path = self.descent.get_f()([x_path])
+            y_path = self.descent.get_f().call_without_memorization(x_path)
             ax.plot(x_path, y_path, color='red', linewidth=3, alpha=0.9, label='Путь')
             ax.scatter(x_path[0], y_path[0], color='lime', s=250, edgecolor='black', label='Старт')
             ax.scatter(x_path[-1], y_path[-1], color='red', s=250, edgecolor='black', label='Минимум')

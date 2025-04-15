@@ -1,4 +1,5 @@
 from typing import Callable, List
+from functools import lru_cache
 
 class FunctionWrapper:
     """
@@ -8,21 +9,24 @@ class FunctionWrapper:
         """
             :param f: - функция, которую мы хотим обернуть
         """
-        self.memo = None
         self.f = f
         self.count = 0
 
+    # @lru_cache(maxsize=None)
     def __call__(self, *args) -> float:
         """
             :param x: - точка, в которой мы хотим посчитать значение функции
         """
-        if self.memo is not None and args in self.memo:
-            return self.memo[args]
-        
         self.count += 1
         res = self.f(*args)
-        if self.memo is not None:
-            self.memo[args] = res
+        return res
+
+    def call_without_memorization(self, *args) -> float:
+        """
+            Вызов функции без мемоизации (для графиков)
+            :param x: - точка, в которой мы хотим посчитать значение функции
+        """
+        res = self.f(*args)
         return res
     
     def get_count(self) -> int:

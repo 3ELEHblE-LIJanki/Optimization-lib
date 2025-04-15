@@ -8,12 +8,14 @@ from function_wrapper import FunctionWrapper
 
 EPS = 1e-8
 
+
 def diff(f, x, eps, index: int):
-    x_i = x.copy()
+    x_i = list(x)
     x_i[index] += eps
-    x_j = x.copy()
+    x_j = list(x)
     x_j[index] -= eps
-    return (f(x_i) - f(x_j)) / (2 * eps)
+    return (f(tuple(x_i)) - f(tuple(x_j))) / (2 * eps)
+
 
 def __gradient(f, x, eps):
     grad = []
@@ -21,10 +23,13 @@ def __gradient(f, x, eps):
         grad.append(diff(f, x, eps, i))
     return grad
 
+
 gradient = FunctionWrapper(__gradient)
+
 
 def double_diff(f, x, eps, ind1, ind2):
     return diff(lambda x: diff(f, x, eps, ind1), x, eps, ind2)
+
 
 def __hessian(f, x, eps):
     hess = []
@@ -35,7 +40,9 @@ def __hessian(f, x, eps):
         hess.append(tmp)
     return hess
 
+
 hessian = FunctionWrapper(__hessian)
+
 
 def mult(x_1, x_2):
     res = 0
@@ -43,17 +50,20 @@ def mult(x_1, x_2):
         res += x_1[i] * x_2[i]
     return res
 
+
 def addv(x_1, x_2):
     return [x_1[i] + x_2[i] for i in range(len(x_1))]
 
+
 def boundize(x, bounds):
-    return [min(bounds[i][1], max(bounds[i][0], x[i])) for i in range(len(x))]
+    return tuple([min(bounds[i][1], max(bounds[i][0], x[i])) for i in range(len(x))])
 
 
-LRS = Callable[[tuple, int, FunctionWrapper, List[List[float]]], float]
+LRS = Callable[[tuple, int, FunctionWrapper, tuple[tuple[float]]], float]
 '''
     Тип для Learning rate scheduling
 '''
+
 
 def armiho(c1: float, q: float) -> LRS:
     """
@@ -65,6 +75,7 @@ def armiho(c1: float, q: float) -> LRS:
     """
     return lambda x, _, f, f_bounds: _arm(c1, q, x, f, f_bounds)
 
+
 def _arm(c1, q, x, f, f_bounds):
     ff = gradient(f, x, EPS)
     fff = [-ff_i for ff_i in ff]
@@ -73,6 +84,7 @@ def _arm(c1, q, x, f, f_bounds):
     while l(a) < f(boundize(addv([a * ff_i for ff_i in fff], x), f_bounds)):
         a = q * a
     return a
+
 
 def wolfe(c1: float = 1e-4, c2: float = 0.9) -> LRS:
     """
@@ -116,6 +128,7 @@ def _wolfe(c1, c2, x, f, f_bounds):
             continue
         return a
     return a
+
 
 def goldstein(c1: float = 0.1) -> LRS:
     """
@@ -170,6 +183,7 @@ def constant(h0: float) -> LRS:
     """
     return lambda _x, _k, _f, _b: h0
 
+
 def exponential_decay(h0: float, l: float) -> LRS:
     """
     Функциональный метод планирования шага (Экспоненциальное затухание)
@@ -179,7 +193,8 @@ def exponential_decay(h0: float, l: float) -> LRS:
 
     :return: - Функциональный LRS (learning rate scheduling) с заданными гипер-параметрами
     """
-    return lambda _x, k, _f, _b: h0 * math.e**(-l * k)
+    return lambda _x, k, _f, _b: h0 * math.e ** (-l * k)
+
 
 def polynomial_decay(a: float, b: float) -> LRS:
     """
@@ -190,7 +205,7 @@ def polynomial_decay(a: float, b: float) -> LRS:
 
     :return: - Функциональный LRS (learning rate scheduling) с заданными гипер-параметрами
     """
-    return lambda _x, k, _f, _b: (1.0 / math.sqrt(k + 1)) * (b * k + 1)**(-a)
+    return lambda _x, k, _f, _b: (1.0 / math.sqrt(k + 1)) * (b * k + 1) ** (-a)
 
 
 def linear_search(eps: float, max_steps_count: int, lin_algo) -> Callable:
@@ -204,7 +219,8 @@ def linear_search(eps: float, max_steps_count: int, lin_algo) -> Callable:
     return lambda x, _, f, f_bounds: __linear_search(x, f, eps, max_steps_count, f_bounds, lin_algo)
 
 
-def __linear_search(x: np.ndarray, f: Callable, eps: float, max_steps_count: int, f_bounds: List[List[float]], lin_algo):
+def __linear_search(x: np.ndarray, f: Callable, eps: float, max_steps_count: int, f_bounds: List[List[float]],
+                    lin_algo):
     """
     Выполняет линейный поиск в направлении антиградиента.
 
@@ -227,7 +243,7 @@ def __linear_search(x: np.ndarray, f: Callable, eps: float, max_steps_count: int
     min_positive_candidate = np.min(candidates[candidates > 0], initial=np.inf)
     bounds[0, 1] = min(bounds[0, 1], min_positive_candidate)
 
-    objective_function = lambda h: f(x - h * grad)
+    objective_function = lambda h: f(tuple(x - h * grad))
 
     linear_searcher = LinearDecent(objective_function, bounds, eps, lin_algo)
     linear_searcher.find_min(bounds[0, 0], max_steps_count)
