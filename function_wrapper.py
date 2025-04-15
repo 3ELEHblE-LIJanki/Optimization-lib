@@ -12,7 +12,7 @@ class FunctionWrapper:
         self.f = f
         self.count = 0
 
-    # @lru_cache(maxsize=None)
+    @lru_cache(maxsize=None)
     def __call__(self, *args) -> float:
         """
             :param x: - точка, в которой мы хотим посчитать значение функции
