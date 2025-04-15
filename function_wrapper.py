@@ -15,11 +15,14 @@ class FunctionWrapper:
         """
             x: - точка, в которой мы хотим посчитать значение функции
         """
-        if (args in self.memo):
-            return self.memo[args]
-        
         self.count += 1
         res = self.f(*args)
+        if ("memo" not in self.__dict__):
+            # self.__dict__["memo"] = {}
+            return res
+        if (args in self.memo):
+            return self.memo[args]
+
         self.memo[args] = res
         return res
     
