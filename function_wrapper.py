@@ -14,9 +14,6 @@ class FunctionWrapper:
         self.count = 0
 
     def __call__(self, *args) -> float:
-        """
-            :param x: - точка, в которой мы хотим посчитать значение функции
-        """
         return self.f_cached(pickle.dumps(args))
 
     @lru_cache(maxsize=None)

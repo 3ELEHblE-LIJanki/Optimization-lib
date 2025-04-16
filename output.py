@@ -15,7 +15,7 @@ def pretty_print(descent, name, found_result, gradient=None, hessian=None):
             hessian calls count:  {:d}
           """.format(name,
                      found_result,
-                     str(descent.get_path()[-1]),
+                     str([ "{:.20f}".format(x_i) for x_i in descent.get_path()[-1]]),
                      len(descent.get_path()),
                      descent.get_f().get_count(),
                      grad,

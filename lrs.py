@@ -95,10 +95,10 @@ def wolfe(c1: float = 1e-4, c2: float = 0.9) -> LRS:
 
     :return: - LRS (learning rate scheduling) по правилу Вольфе с заданными гипер-параметрами
     """
-    return lambda x, _, f, f_bounds: _wolfe(c1, c2, x, f, f_bounds)
+    return lambda x, _, f, f_bounds: _wolfe(c1, c2, x, f, f_bounds, np.array(gradient(f, x, EPS)))
 
 
-def _wolfe(c1, c2, x, f, f_bounds):
+def _wolfe(c1, c2, x, f, f_bounds, p):
     max_iterations = 100
     a = 1
 
@@ -109,7 +109,6 @@ def _wolfe(c1, c2, x, f, f_bounds):
     # (1-Armijo) f(x + a * p) <= f(x) + c1 * a * graf(f)^T * p
     # (2-Curvature) grad(f(x + ap))^T * p >= c2 * grad(f(x))^T * p
 
-    p = -grad_x_np
     right = grad_x_np.dot(p)  # grad(f(x))^T p - где p - прошлое направление - в моём случае -grad (??)
 
     for _ in range(max_iterations):

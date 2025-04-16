@@ -1,31 +1,32 @@
 from typing import List
 from function_wrapper import FunctionWrapper
-from lrs import LRS, hessian, gradient, boundize
+from lrs import LRS, _wolfe, gradient, boundize
 import numpy as np
 
 
-class NewtonCG:
+class BFGS:
     """
         Класс реализующий поиск максимума и минимума на основе градиентного спуска и переданных параметров
     """
 
     ACCEPTABLE_ACCURACY: float = 0.00001
 
-    def __init__(self, learning_rate_scheduling: LRS, f: FunctionWrapper, bounds: List[List[float]],
+    def __init__(self, f: FunctionWrapper, bounds: List[List[float]],
                  eps: float = ACCEPTABLE_ACCURACY):
         """
-            :param learning_rate_scheduling: - выбранная модель поиска шага
             :param f: - функция для вычисления
             :param bounds: - границы функции
             :param eps: - точность подсчёта градиента
         """
-        self.learning_rate_scheduling = learning_rate_scheduling
+        self.learning_rate_scheduling = lambda x, p: _wolfe(0.0001, 0.4, x, f, bounds, p) 
         self.f = f
         self.bounds = bounds
         self.eps = eps
+        self.I = np.eye(len(bounds))
 
     def __init(self, start: List[float]):
         self.x = start.copy()
+        self.C = self.I.copy()
         self.path = []
 
     def find_min(self, start, max_iterations):
@@ -40,9 +41,16 @@ class NewtonCG:
             G = np.array(gradient(self.f, self.x, self.eps))
             if np.linalg.norm(G) <= self.eps:
                 break
-            H = np.array(hessian(self.f, self.x, self.eps))
-            l = self.learning_rate_scheduling(self.x, i, self.f, self.bounds)
-            self.x = boundize(np.array(self.x) - l * np.linalg.inv(H).dot(G), self.bounds)
+            P = self.C.dot(-G)
+            l = self.learning_rate_scheduling(self.x, P)
+            new_x = boundize(self.x + l * P, self.bounds)
+            s = np.array(new_x) - np.array(self.x)
+            y = np.array(gradient(self.f, new_x, self.eps)) - G
+            p = 1 / y.dot(s)
+            new_C = (self.I - p * s.dot(y)).dot(self.C).dot(self.I - p * y.dot(s)) + p * s.dot(s)
+            self.C = new_C
+            self.x = new_x
+            
 
         return self.f(self.x)
 
