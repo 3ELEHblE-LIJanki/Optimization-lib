@@ -78,7 +78,7 @@ class GradientDecent:
         return [self.x, self.f(self.x)]
 
 
-class SimpyWrapper:
+class ScipyWrapper:
     """
         Класс реализующий поиск максимума и минимума на основе scipy.optimize
     """

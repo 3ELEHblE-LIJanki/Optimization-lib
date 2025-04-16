@@ -47,7 +47,9 @@ class BFGS:
             s = np.array(new_x) - np.array(self.x)
             y = np.array(gradient(self.f, new_x, self.eps)) - G
             p = 1 / y.dot(s)
-            new_C = (self.I - p * s.dot(y)).dot(self.C).dot(self.I - p * y.dot(s)) + p * s.dot(s)
+            tmp1 = self.I - p * s[:, np.newaxis] * y[np.newaxis, :]
+            tmp2 = self.I - p * y[:, np.newaxis] * s[np.newaxis, :]
+            new_C = np.dot(tmp1, np.dot(self.C, tmp2)) + (p * s[:, np.newaxis] * s[np.newaxis, :])
             self.C = new_C
             self.x = new_x
             
