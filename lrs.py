@@ -95,7 +95,7 @@ def wolfe(c1: float = 1e-4, c2: float = 0.9) -> LRS:
 
     :return: - LRS (learning rate scheduling) по правилу Вольфе с заданными гипер-параметрами
     """
-    return lambda x, _, f, f_bounds: _wolfe(c1, c2, x, f, f_bounds, np.array(gradient(f, x, EPS)))
+    return lambda x, _, f, f_bounds: _wolfe(c1, c2, x, f, f_bounds, -np.array(gradient(f, x, EPS)))
 
 
 def _wolfe(c1, c2, x, f, f_bounds, p):

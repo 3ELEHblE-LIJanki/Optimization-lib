@@ -8,3 +8,4 @@ ipython>=8.18.1
 optuna
 ipywidgets
 cloudpickle
+dill
