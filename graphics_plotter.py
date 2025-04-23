@@ -39,7 +39,7 @@ class GraphicsPlotter:
         bounds = [np.linspace(start, end, 1000) for start, end in self.descent.get_bounds()]
         if self.is_1d:
             x = bounds[0]
-            f_values = self.f(x)
+            f_values = self.f([x])
             ax.plot(x, f_values, color=sns.color_palette("flare")[2], linewidth=2, alpha=0.9, label='Функция')
         else:
             grid = np.meshgrid(*bounds)
@@ -54,7 +54,7 @@ class GraphicsPlotter:
         path = np.array(self.descent.get_path())
         if self.is_1d:
             x_path = path
-            y_path = self.f(x_path)
+            y_path = self.f([x_path])
             ax.plot(x_path, y_path, color='red', linewidth=3, alpha=0.9, label='Путь')
             ax.scatter(x_path[0], y_path[0], color='lime', s=250, edgecolor='black', label='Старт')
             ax.scatter(x_path[-1], y_path[-1], color='red', s=250, edgecolor='black', label='Минимум')
