@@ -35,7 +35,7 @@ class ParamOptimizer:
                 gradient.clear()
                 algo_instance = self._algo_partial(lrs(*trial_params))
                 res = algo_instance.find_min(start, max_iterations)
-                return self._f.get_count(), round(res / self.eps) * self.eps
+                return self._f.get_count(), res // self.eps * self.eps
             except Exception as e:
                 print(f"Ошибка в испытании: {e}")
                 raise optuna.TrialPruned()
