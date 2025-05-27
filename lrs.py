@@ -1,3 +1,4 @@
+import random
 from typing import Callable, List
 import math
 
@@ -26,6 +27,15 @@ def __gradient(f, x, eps):
 
 gradient = FunctionWrapper(__gradient)
 
+def __gradient_stochastic(X_batch: np.array, y_batch: np.array, x: np.array) -> np.array:
+    error = y_batch - X_batch.dot(x)
+    grad = 2 * X_batch.T.dot(error) / len(X_batch)
+    return grad
+
+'''
+    Считает градиет только по 1 рандомному параметру
+'''
+gradient_stochastic = FunctionWrapper(__gradient_stochastic)
 
 def double_diff(f, x, eps, ind1, ind2):
     return diff(lambda x: diff(f, x, eps, ind1), x, eps, ind2)
