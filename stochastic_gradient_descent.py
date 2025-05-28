@@ -2,9 +2,8 @@ from typing import Callable, List
 from scipy.optimize import minimize
 
 import numpy as np
-from winerror import DXGI_ERROR_MORE_DATA
 
-from lrs import LRS, gradient, REG, regularity, regularity_L1, regularity_L2
+from lrs import LRS, gradient, boundize, REG, regularity, regularity_L1, regularity_L2
 from function_wrapper import FunctionWrapper
 
 
@@ -40,16 +39,18 @@ class StochGradientDecent:
     def __init(self, start: List[float]):
         self.x = start.copy()  # это веса для линейной регрессии
         self.path = []
+        self.f.clear()
 
-    def __find(self, start: np.array, max_iterations, op):
+    def __find(self, start: np.array, max_iterations, op, gamma=None):
         self.__init(start)
         self.loss_history = []
+        E = np.zeros(len(self.x))
         for i in range(max_iterations):
             self.path.append(self.x)
             # self.path.append(self.x)
 
             # градиент посчитали
-            grad = self.culc_grad()
+            grad = np.array(self.calc_grad())
 
             # Функция потерь для данного batch
             h = self.learning_rate_scheduling(self.x, i, self.f, self.bounds)
@@ -58,33 +59,34 @@ class StochGradientDecent:
             current_loss = self._mse_loss(self.x)
             self.loss_history.append(current_loss)
 
-            # Регулярность reg - векор. Мы сразу считаем производную и добавим ее к градиенту
+            # Регулярность reg - вектор. Мы сразу считаем производную и добавим ее к градиенту
             reg = self.regular(self.x)
+
+            # Вычисляем шаг
+            if gamma == None:
+                delta = h * (grad + reg)
+            else:
+                E = gamma * E + (1 - gamma) * np.square(grad)
+                delta = np.divide(h * (grad + reg), np.sqrt(E))
 
             # делаем шаг спуска
             # # обрезаем по границам, если вылезло
-            xx = []
-            for j in range(len(self.x)):
-                coord = op(self.x[j], h * (grad[j] + reg[j]))
-                # print(coord)
-                coord = max(coord, self.bounds[j][0])
-                coord = min(coord, self.bounds[j][1])
-                xx.append(coord)
-
+            xx = boundize(op(self.x, delta), self.bounds)
+            
             if np.linalg.norm(np.array(self.x) - np.array(xx)) < self.eps:
                 break
             self.x = np.array(xx)
 
         return self.f(self.x)
 
-    def culc_grad(self):
+    def calc_grad(self):
         # выбираем рандомные индексы -> batch
         batch_indices = np.random.choice(len(self.X_data), self.batch_size, replace=False)
         X_batch, y_batch = self.X_data[batch_indices], self.Y_data[batch_indices]
 
-        # считаем градиент по формуле (хардкод)
-        error = y_batch - X_batch.dot(self.x)
-        grad = -1 * 2 * X_batch.T.dot(error) / self.batch_size
+        # # считаем градиент по формуле (хардкод)
+        # error = y_batch - X_batch.dot(self.x)
+        # grad = -1 * 2 * X_batch.T.dot(error) / self.batch_size
 
         # считаем правильное количество вызовов функции в зависимости от batch
         mse_loss_batch = FunctionWrapper(lambda weights: np.mean((y_batch - X_batch.dot(weights)) ** 2))
@@ -99,22 +101,22 @@ class StochGradientDecent:
         X, y = self.X_data, self.Y_data
         return np.mean((y - X.dot(weights)) ** 2)
 
-    def find_min(self, start: List[float], max_iterations: int) -> float:
+    def find_min(self, start: List[float], max_iterations: int, gamma: float = None) -> float:
         """
             :param  start: List[float] - стартовая точка, в которой начнём поиск
             :param  max_iterations: int - максимальное количество итераций спуска
             :return: - минимум полученный в ходе спуска
         """
 
-        return self.__find(np.array(start), max_iterations, lambda x, y: x - y)
+        return self.__find(np.array(start), max_iterations, lambda x, y: x - y, gamma)
 
-    def find_max(self, start: List[float], max_iterations: int) -> float:
+    def find_max(self, start: List[float], max_iterations: int, gamma: float = None) -> float:
         """
             :param start: - стартовая точка, в которой начнём поиск
             :param max_iterations: - максимальное количество итераций спуска
             :return: - максимум полученный в ходе спуска
         """
-        return self.__find(start, max_iterations, lambda x, y: x + y)
+        return self.__find(start, max_iterations, lambda x, y: x + y, gamma)
 
     def get_bounds(self):
         return self.bounds
