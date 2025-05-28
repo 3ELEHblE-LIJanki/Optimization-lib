@@ -30,7 +30,7 @@ class StochGradientDecent:
         self.batch_size = batch_size
         self.f = FunctionWrapper(self._mse_loss)
 
-        X_data_with_1 = np.c_[np.ones(X_data.shape[0]), X_data]
+        X_data_with_1 = np.c_[np.ones(X_data.shape[0]), X_data] # добавили в каждый вектор коэффициентов - 1 (типа константа)
 
         self.X_data = X_data_with_1
         self.Y_data = Y_data
@@ -43,44 +43,35 @@ class StochGradientDecent:
         self.__init(start)
         for i in range(max_iterations):
             self.path.append(self.x)
+            # self.path.append(self.x)
 
             # выбираем рандомные индексы -> batch
-            # rand = np.random.RandomState(i)
-
             batch_indices = np.random.choice(len(self.X_data), self.batch_size, replace=False)
             X_batch, y_batch = self.X_data[batch_indices], self.Y_data[batch_indices]
 
             # считаем градиент по формуле
-            error = y_batch - X_batch.dot(self.x)  # добавить (1, x1, x2...) !!!!!!
-            grad = 2 * X_batch.T.dot(error) / self.batch_size
-            # grad = gradient_stochastic(X_batch, y_batch, self.x)
-
+            error = y_batch - X_batch.dot(self.x)
+            # grad = -1 * 2 * X_batch.T.dot(error) / self.batch_size
             mse_loss_batch = lambda weights: np.mean((y_batch - X_batch.dot(weights)) ** 2)
-            # grad = gradient(mse_loss_batch, self.x, self.eps)
+            grad = gradient(mse_loss_batch, self.x, self.eps)
 
             # Функция потерь для данного batch
-            # print(grad)
-            h = self.learning_rate_scheduling(self.x, i, mse_loss_batch, self.bounds)
+            h = self.learning_rate_scheduling(self.x, i, self.f, self.bounds)
 
             # делаем шаг спуска
-            # new_x = self.x - h * grad
             # # обрезаем по границам, если вылезло
-            # new_x = np.clip(new_x, [b[0] for b in self.bounds], [b[1] for b in self.bounds])
             xx = []
             for j in range(len(self.x)):
                 coord = op(self.x[j], h * grad[j])
-                print(coord)
+                # print(coord)
                 coord = max(coord, self.bounds[j][0])
                 coord = min(coord, self.bounds[j][1])
                 xx.append(coord)
 
-            # ?????????
             if np.linalg.norm(np.array(self.x) - np.array(xx)) < self.eps:
                 break
             self.x = np.array(xx)
-            print(self.x)
 
-            # print("current: " + str(i) + " " + str(self.f(self.x)))
         return self.f(self.x)
 
     def _mse_loss(self, weights) -> float:
@@ -116,3 +107,6 @@ class StochGradientDecent:
 
     def current_point(self):
         return [self.x, self.f(self.x)]
+
+    def get_x(self):
+        return self.x
