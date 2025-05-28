@@ -42,6 +42,7 @@ class StochGradientDecent:
 
     def __find(self, start: np.array, max_iterations, op):
         self.__init(start)
+        self.loss_history = []
         for i in range(max_iterations):
             self.path.append(self.x)
             # self.path.append(self.x)
@@ -51,6 +52,10 @@ class StochGradientDecent:
 
             # Функция потерь для данного batch
             h = self.learning_rate_scheduling(self.x, i, self.f, self.bounds)
+
+            # После вычисления новых весов (для статистики функции потерь)
+            current_loss = self._mse_loss(self.x)
+            self.loss_history.append(current_loss)
 
             # Регулярность reg - векор. Мы сразу считаем производную и добавим ее к градиенту
             reg = self.regular(self.x)
@@ -76,14 +81,14 @@ class StochGradientDecent:
         batch_indices = np.random.choice(len(self.X_data), self.batch_size, replace=False)
         X_batch, y_batch = self.X_data[batch_indices], self.Y_data[batch_indices]
 
-        # считаем градиент по формуле
+        # считаем градиент по формуле (хардкод)
         error = y_batch - X_batch.dot(self.x)
         grad = -1 * 2 * X_batch.T.dot(error) / self.batch_size
 
-        # # костыль что бы считалось правильно кол-во вызовв ф-ии
-        # mse_loss_batch = FunctionWrapper(lambda weights: np.mean((y_batch - X_batch.dot(weights)) ** 2))
-        # grad = gradient(mse_loss_batch, self.x, self.eps)
-        # self.f.add_count(mse_loss_batch.get_count())
+        # считаем правильное количество вызовов функции в зависимости от batch
+        mse_loss_batch = FunctionWrapper(lambda weights: np.mean((y_batch - X_batch.dot(weights)) ** 2))
+        grad = gradient(mse_loss_batch, self.x, self.eps)
+        self.f.add_count(mse_loss_batch.get_count())
 
         return grad
 

@@ -9,3 +9,6 @@ optuna
 ipywidgets
 plotly
 dill
+ucimlrepo
+memory_profiler
+psutil

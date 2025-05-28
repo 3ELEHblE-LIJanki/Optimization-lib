@@ -33,12 +33,10 @@ def pretty_dataset_print(descent, name, found_result, gradient=None, hessian=Non
             steps count:          {:d}
             function calls count: {:d}
             gradient calls count: {:d}
-            hessian calls count:  {:d}
           """.format(name,
                      found_result,
                      str([ "{:.20f}".format(x_i) for x_i in descent.get_path()[-1]]),
                      len(descent.get_path()),
                      descent.get_f().get_count(),
-                     grad,
-                     hess)
+                     grad)
           )
