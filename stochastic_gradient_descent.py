@@ -30,6 +30,7 @@ class StochGradientDecent:
         self.batch_size = batch_size
         self.f = FunctionWrapper(self._mse_loss)
         self.regular = regular
+        self.loss_history = []
 
         X_data_with_1 = np.c_[np.ones(X_data.shape[0]), X_data] # добавили в каждый вектор коэффициентов - 1 (типа константа)
 

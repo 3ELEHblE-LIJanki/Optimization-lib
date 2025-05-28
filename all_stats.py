@@ -67,7 +67,7 @@ def plot_optimization_history(optimizer, title: str):
     plt.xlabel('Итерация')
     plt.ylabel('Значение ошибки')
     plt.title(f'{title}\nФинальная ошибка: {errors[-1]:.4f}')
-    plt.grid(True)
+    plt.grid(color="Lightpink", visible=True)
     plt.legend()
     plt.show()
 
