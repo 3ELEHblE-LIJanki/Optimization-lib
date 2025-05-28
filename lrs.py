@@ -27,15 +27,6 @@ def __gradient(f, x, eps):
 
 gradient = FunctionWrapper(__gradient)
 
-def __gradient_stochastic(X_batch: np.array, y_batch: np.array, x: np.array) -> np.array:
-    error = y_batch - X_batch.dot(x)
-    grad = 2 * X_batch.T.dot(error) / len(X_batch)
-    return grad
-
-'''
-    Считает градиет только по 1 рандомному параметру
-'''
-gradient_stochastic = FunctionWrapper(__gradient_stochastic)
 
 def double_diff(f, x, eps, ind1, ind2):
     return diff(lambda x: diff(f, x, eps, ind1), x, eps, ind2)
@@ -67,6 +58,16 @@ def addv(x_1, x_2):
 
 def boundize(x, bounds):
     return tuple([min(bounds[i][1], max(bounds[i][0], x[i])) for i in range(len(x))])
+
+
+REG = Callable[[float], List[float]]
+def regularity(k, l1_ratio) -> REG:
+    # l1_term = l1_ratio * k * np.sign(x)
+    # l2_term = (1 - l1_ratio) * k * x
+    return lambda x: l1_ratio * k * np.sign(x)   +   (1 - l1_ratio) * k * x
+
+regularity_L1 = lambda k: regularity(k, l1_ratio=1)
+regularity_L2 = lambda k: regularity(k, l1_ratio=0)
 
 
 LRS = Callable[[tuple, int, FunctionWrapper, tuple[tuple[float]]], float]

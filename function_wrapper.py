@@ -49,3 +49,6 @@ class FunctionWrapper:
         """
         self.count = 0
         self._cache.clear()
+
+    def add_count(self, k):
+        self.count += k
