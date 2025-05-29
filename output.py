@@ -40,3 +40,24 @@ def pretty_dataset_print(descent, name, found_result, gradient=None, hessian=Non
                      descent.get_f().get_count(),
                      grad)
           )
+    
+def pretty_print_annealing(descent, name, found_result):
+    # found_result = found_result.tolist()
+    found_x = descent.x.tolist()
+    print(found_x)
+    print("""
+        {:s}
+            found result:         {:f}
+            found result in:      {:s}
+            alpha:          {:d}
+            T0: {:d}
+            steps count:          {:d}
+            function calls count: {:d}
+          """.format(name,
+                     found_result,
+                     str([ "{:.20f}".format(x_i) for x_i in found_x]),
+                     descent.alpha,
+                     descent.T0,
+                     len(descent.get_path()),
+                     descent.get_f().get_count())
+          )
